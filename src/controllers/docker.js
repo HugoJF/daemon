@@ -547,6 +547,12 @@ class Docker {
                                 Type: 'bind',
                                 ReadOnly: true,
                             },
+                            {
+                                Target: Config.get('docker.localtime_path'),
+                                Source: Config.get('docker.localtime_path'),
+                                Type: 'bind',
+                                ReadOnly: true,
+                            },
                         ],
                         Tmpfs: {
                             '/tmp': Config.get('docker.policy.container.tmpfs', 'rw,exec,nosuid,size=50M'),
