@@ -146,6 +146,9 @@ class Option {
                     AttachStdout: true,
                     AttachStderr: true,
                     Env: environment,
+                    CpuQuota: 100000,
+                    CpuPeriod: 100000,
+                    CpuShares: 1024,
                     Mounts: [
                         {
                             Source: this.server.path(),
