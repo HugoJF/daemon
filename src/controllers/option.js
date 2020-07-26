@@ -54,7 +54,7 @@ class Option {
         Request({
             method: 'GET',
             url: endpoint,
-            timeout: 5000,
+            timeout: 60000,
             headers: {
                 'Accept': 'application/vnd.pterodactyl.v1+json',
                 'Authorization': `Bearer ${Config.get('keys.0')}`,
