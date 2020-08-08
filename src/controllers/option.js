@@ -32,6 +32,7 @@ const Util = require('util');
 const _ = require('lodash');
 const isStream = require('isstream');
 const createOutputStream = require('create-output-stream');
+const exec = require('child_process').exec;
 
 const ConfigHelper = rfr('src/helpers/config.js');
 const ImageHelper = rfr('src/helpers/image.js');
@@ -129,7 +130,17 @@ class Option {
                 this.server.log.info('Temporarily suspending server to avoid mishaps...');
                 this.server.suspend(callback);
             }],
-            run: ['setup_stream', 'image', (results, callback) => {
+            pre_clone: ['suspend', (results, callback) => {
+                const eggUuid = this.server.json.service.egg;
+                const master = Path.join(Config.get('sftp.path', '/srv/daemon-data'), `MASTER_${eggUuid}`);
+                const destination = this.server.path();
+                this.server.log.info(`Checking for a master server for egg ${eggUuid} at ${master}`);
+                if (Fs.pathExistsSync(master)) {
+                    this.server.log.info(`Found master server, cloning to ${destination}`);
+                    exec(`cp -avrl ${master} ${destination}`, callback);
+                }
+            }],
+            run: ['setup_stream', 'image', 'pre_clone', (results, callback) => {
                 this.server.log.debug('Running privileged docker container to perform the installation process.');
 
                 const environment = [];
@@ -202,7 +213,9 @@ class Option {
                 this.server.fs.chown('/', callback);
             }],
         }, err => {
-            this.server.unsuspend(() => { _.noop(); });
+            this.server.unsuspend(() => {
+                _.noop();
+            });
 
             // No script, no need to kill everything.
             if (err && err.code === 'E_NOSCRIPT') {
