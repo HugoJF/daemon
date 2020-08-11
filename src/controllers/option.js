@@ -132,7 +132,7 @@ class Option {
             }],
             pre_clone: ['suspend', (results, callback) => {
                 const eggUuid = this.server.json.service.egg;
-                const master = Path.join(Config.get('sftp.path', '/srv/daemon-data'), `MASTER_${eggUuid}`);
+                const master = Path.join(Config.get('sftp.path', '/srv/daemon-data'), `MASTER_${eggUuid}`, '.');
                 const destination = this.server.path();
                 this.server.log.info(`Checking for a master server for egg ${eggUuid} at ${master}`);
                 if (Fs.pathExistsSync(master)) {
