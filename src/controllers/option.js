@@ -137,7 +137,17 @@ class Option {
                 this.server.log.info(`Checking for a master server for egg ${eggUuid} at ${master}`);
                 if (Fs.pathExistsSync(master)) {
                     this.server.log.info(`Found master server, cloning to ${destination}`);
-                    exec(`cp -avrl ${master} ${destination}`, callback);
+                    exec(`cp -avrl ${master} ${destination}`, (err, stdout, stderr) => {
+                        if (err) {
+                            this.server.log.error(stderr);
+                            return callback(err);
+                        }
+                        this.server.log.info('Master server clone finished without errors');
+                        return callback();
+                    });
+                } else {
+                    this.server.log.info(`Could not find master server for egg ${eggUuid}`);
+                    return callback();
                 }
             }],
             run: ['setup_stream', 'image', 'pre_clone', (results, callback) => {
